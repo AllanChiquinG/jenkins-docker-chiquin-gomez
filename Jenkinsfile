@@ -32,16 +32,14 @@ pipeline {
 
         stage('Construcción') {
             steps {
-                bat "docker build -t %IMAGE_NAME%:%BUILD_NUMBER% ."
+                sh "docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} ."
             }
         }
 
         stage('Despliegue') {
             steps {
-                script {
-                    bat "docker rm -f %CONTAINER_NAME% || exit 0"
-                }
-                bat "docker run -d --name %CONTAINER_NAME% -p %APP_PORT%:80 %IMAGE_NAME%:%BUILD_NUMBER%"
+                sh "docker rm -f ${CONTAINER_NAME} || true"
+                sh "docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:80 ${IMAGE_NAME}:${BUILD_NUMBER}"
             }
         }
 
@@ -54,10 +52,10 @@ pipeline {
 
     post {
         success {
-            echo " Pipeline ejecutado exitosamente. Imagen: ${IMAGE_NAME}:${BUILD_NUMBER}"
+            echo "Pipeline ejecutado exitosamente. Imagen: ${IMAGE_NAME}:${BUILD_NUMBER}"
         }
         failure {
-            echo " El pipeline falló. Revisa la salida de consola para más detalles."
+            echo "El pipeline falló. Revisa la salida de consola para más detalles."
         }
     }
 }
